@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       "
+	default-lazy-init="true">
+
+	<!-- <bean id="commonPropertyConfigurer" class="com.ailk.eaap.o2p.common.spring.config.EncryptPropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="locations">
+            <list>
+                <value>classpath:eaap_common.properties</value>
+            </list>
+        </property>
+	</bean> -->
+	
+	<bean class="com.ailk.eaap.o2p.common.spring.config.O2pPropertyPlaceholderConfigurer">
+        <property name="remoteOverride" value="true"></property>
+        <property name="cacheHolder" ref="cacheHolder"></property>
+    </bean>
+    
+    <bean id="cacheHolder" class="com.ailk.eaap.o2p.common.spring.config.ZKCfgCacheHolder">
+		<property name="ignoreResourceNotFound" value="true"></property>
+	</bean>
+	 <bean id="common-dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName">
+			<value>${o2pCommon.jdbcDriver}</value>
+		</property>
+		<property name="url">
+			<value>${o2pCommon.database}</value>
+		</property>
+		<property name="username">
+			<value>${o2pCommon.user}</value>
+		</property>
+		<property name="password">
+			<value>${o2pCommon.password}</value>
+		</property>
+		<property name="maxActive">
+			<value>${o2pCommon.maxActive}</value>
+		</property>
+		<property name="maxIdle">
+			<value>${o2pCommon.maxIdle}</value>
+		</property>
+		<property name="minIdle">
+			<value>${o2pCommon.minIdle}</value>
+		</property>
+		<property name="initialSize">
+			<value>${o2pCommon.initialSize}</value>
+		</property>
+		<property name="accessToUnderlyingConnectionAllowed">
+			<value>${o2pCommon.accessToUnderlyingConnectionAllowed}</value>
+		</property>
+		<property name="testOnBorrow" value="true"/>     
+        <property name="testWhileIdle" value="true"/>     
+        <property name="validationQuery" value="select 1 from dual"/> 
+	</bean>
+	
+	<bean id="wsdlDao" class="com.asiainfo.o2p.wsdl.dao.WsdlDaoImpl"  >
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<bean id="wsdlBmo" class="com.asiainfo.o2p.wsdl.bmo.WsdlBmoImpl"  >
+		<property name="wsdlDao" ref="wsdlDao"/>
+		<property name="wsdlValidate" ref="wsdlValidate"/>
+	</bean>
+	
+	<bean id="parseDao" class="com.asiainfo.o2p.wsdl.dao.WsdlParseDaoImpl"  >
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate"/>
+	</bean>
+	
+	<bean id="wsdlParseImpl" class="com.asiainfo.o2p.wsdl.bmo.WsdlParseImpl"  >
+		<property name="parseDao" ref="parseDao"/>
+	</bean>
+	
+	<bean id="wsdlValidate" class="com.asiainfo.o2p.wsdl.bmo.WsdlBmoValidateImpl"  >
+		<property name="wsdlDao" ref="wsdlDao"/>
+	</bean>
+	
+	<bean id="wsdlService" class="com.asiainfo.o2p.wsdl.service.WsdlServiceImpl"  >
+		<property name="wsdlBmo" ref="wsdlBmo"/>
+		<property name="wsdlValidate" ref="wsdlValidate"/>
+		<property name="wsdlParseImpl" ref="wsdlParseImpl"/>
+	</bean>
+	
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" scope="singleton" >
+  		<description>Spring 事务管理</description>
+    	<property name="dataSource" ref="common-dataSource"/>
+  	</bean> 
+	
+	<bean id="commonLobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"/>
+	<!-- Spring iBatis相关 -->
+  	<!-- <bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+  		<description>Spring iBatis结合</description>
+    	<property name="configLocation" value="classpath:sqlMap-config.xml"/>
+    	<property name="dataSource" ref="common-dataSource"/>
+    	<property name="lobHandler" ref="commonLobHandler"/>
+    	<property name="mappingLocations">
+    		<list>
+    			<value>classpath:ibatis/model/${databaseType}/wsdlservice-sqlmap.xml</value>
+			</list>
+    	</property>
+  	</bean>
+  	
+  	<bean id="sqlMapDAO" class="com.linkage.rainbow.dao.impl.IBatisSqlMapDAOImpl" scope="prototype" >
+		<description>数据库基础操作工具包</description>
+		<property name="sqlMapClient" ref="sqlMapClient"/>
+	</bean>-->
+	
+	<bean id="wsdlSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="common-dataSource" />
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:ibatis/model/wsdl-sqlmap.xml</value>
+				<value>classpath:ibatis/model/wsdlservice-sqlmap.xml</value>
+			</list>
+		</property>
+		<!-- <property name="plugins">
+			<array>
+				<ref bean="pagePlugin"/>
+			</array>
+		</property> -->
+		
+		<property name="databaseIdProvider" ref="databaseIdProvider"></property>
+	</bean>
+	
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+		<constructor-arg index="0" ref="wsdlSqlSessionFactory" />
+	</bean>
+	
+	<bean id="databaseIdProvider" class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
+		<property name="properties" ref="vendorProperties"></property>
+	</bean>
+	
+	<bean id="vendorProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+	    <property name="properties">
+	      <props>
+	        <prop key="Oracle">oracle</prop>
+	        <prop key="MySQL">mysql</prop>
+	        <prop key="HSQL Database Engine">hsqldb</prop>
+	      </props>
+	    </property>
+	 </bean>
+	
+	
+	<!-- 系统事务处理AOP配置 -->
+	<aop:config proxy-target-class="true">
+		<!-- 需事务控制切入-->
+		<aop:pointcut id="txPointcut" expression="execution(* com.asiainfo.o2p.wsdl.bmo..*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+	</aop:config>
+	<!-- 系统事务控制配置 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager" >
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED" rollback-for="Exception"/>
+			<tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- 定时任务，清除临时文件 -->
+	
+    
+    <!-- <bean   
+        class="org.springframework.scheduling.quartz.SchedulerFactoryBean">   
+        <property name="triggers">   
+            <list>   
+               
+                <ref bean="cronTrigger" />   
+            </list>   
+        </property>   
+    </bean>   
+    
+     
+    <bean id="cronTrigger"  
+        class="org.springframework.scheduling.quartz.CronTriggerBean">   
+  
+        
+        <property name="jobDetail" ref="clearTask" />   
+        <property name="cronExpression" value="0 0 1 * * ? " />   
+    </bean>   
+    
+	 <bean name="clearTask"  
+        class="org.springframework.scheduling.quartz.JobDetailBean">   
+        <property name="jobClass" value="com.asiainfo.o2p.task.FileClearJob" />   
+    </bean>    -->
+  
+   
+  <bean name="startQuertz" lazy-init="false" autowire="no"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="myJobTrigger" />
+			</list>
+		</property>
+	</bean>
+	<!-- 启动触发器的配置结束 -->
+
+	<!-- quartz-2.x的配置 -->
+	<bean id="myJobTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="myJobDetail" />
+		</property>
+		<property name="cronExpression">
+			<!--middle night 24. do it  -->
+			<value>0 0 1 * * ? </value>
+		</property>
+	</bean>
+	<!-- 调度的配置结束 -->
+
+	<!-- job的配置开始 -->
+	<bean id="myJobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="myJob" />
+		</property>
+		<property name="targetMethod">
+			<value>execute</value>
+		</property>
+	</bean>
+  <bean id="myJob" class="com.asiainfo.o2p.task.FileClearJob" />
+  
+  
+	
+</beans>

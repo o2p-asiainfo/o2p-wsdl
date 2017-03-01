@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<Configuration status="off" monitorInterval="1800">   
+    <Appenders>  
+        <Console name="Console" target="SYSTEM_OUT"> 
+             <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/> 
+             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread][%file:%line] - %msg%n"/>   
+        </Console>  
+  
+        <RollingFile name="RollingFile" fileName="${sys:catalina.base}/logs/all.log"  filePattern="${sys:catalina.base}/logs/all.log.%d{yyyy-MM-dd}.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss}   %-5level [%thread][%file:%line] - %msg%n"/>
+            <Policies>  
+                <TimeBasedTriggeringPolicy modulate="true" interval="1" />  
+                <!--  SizeBasedTriggeringPolicy size="100 MB"/-->  
+            </Policies>  
+            <DefaultRolloverStrategy max="30"/>  
+        </RollingFile>  
+            <Async name="Async" includeLocation="true">
+                  <AppenderRef ref="RollingFile" />
+             </Async>
+    </Appenders>  
+  
+    <Loggers>  
+         <logger name="com.ailk" level="debug"/>
+         <logger name="com.asiainfo" level="debug"/>
+         <logger name="com.eviware" level="debug"/>  
+        <root level="info" includeLocation="true">  
+            <appender-ref ref="Async"/>  
+        </root>  
+    </Loggers>  
+</Configuration>  

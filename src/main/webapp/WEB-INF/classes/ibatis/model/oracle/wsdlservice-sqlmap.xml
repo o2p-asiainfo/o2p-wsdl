@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="wsdlservice">
+
+
+	<!--获取主键ID -->
+	<select id="sequence" parameterType="java.util.Map" resultType="java.lang.Integer">
+		<if test="_databaseId  == 'mysql'">select nextval('${sequenceName}')</if>
+		<if test="_databaseId  == 'oracle'">select ${sequenceName}.nextval from dual</if>
+	</select>
+
+</mapper>

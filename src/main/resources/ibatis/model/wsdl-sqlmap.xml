@@ -1,0 +1,460 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="wsdl">
+
+	<!-- 根据ID获取压缩文件消息 -->
+	<select id="GET_FILE_SHARE" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select s_file_id as SFILEID ,s_file_name as SFILENAME ,s_file_content as SFILECONTENT from file_share where state='A' and s_file_id =#{sFileId} and tenant_id=#{tenantId}
+	</select>
+	<!-- 根据ID删除压缩文件信息 -->
+	<select id="DELETE_FILE_SHARE" parameterType="java.util.HashMap" >
+		delete from file_share where state='A' and s_file_id =#{sFileId}  and tenant_id=#{tenantId}
+	</select>
+	
+	<select id="GET_CONTRACT_DOC_LIST" parameterType="java.util.Map" resultType="java.util.HashMap"  >
+		SELECT CONTRACT_DOC_ID, RESOURCE_ALISS, DOC_VERSION  FROM CONTRACT_DOC WHERE DOC_TYPE='1' 
+		<if test="resourceAliss != null">AND RESOURCE_ALISS=#{resourceAliss}</if>
+		<if test="docVersion != null">AND DOC_VERSION=#{docVersion}</if>
+		<if test="tenantId != null">AND tenant_id=#{tenantId}</if>
+		  ORDER BY CONTRACT_DOC_ID DESC
+	</select>
+	
+	<select id="GET_CONTRACT_CODE_LIST" parameterType="java.util.Map" resultType="java.util.HashMap"  >
+		SELECT CONTRACT_ID, NAME, CODE  FROM CONTRACT WHERE STATE='A' 
+		<if test="contractCode != null">AND CODE=#{contractCode}</if>
+		<if test="tenantId != null">AND tenant_id=#{tenantId}</if>
+		ORDER BY CONTRACT_ID DESC
+	</select>
+	
+	<!--新增协议规格  -->
+	<insert id="ADD_CONTRACT" parameterType="com.ailk.eaap.op2.bo.Contract">
+	  INSERT INTO CONTRACT
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	  CONTRACT_ID,
+		<if test="baseContractId != null"> BASE_CONTRACT_ID,</if>
+		<if test="name != null"> NAME,</if>
+		<if test="code != null"> CODE,</if>
+		<if test="createTime != null"> CREATE_TIME,</if>
+		<if test="state != null"> STATE,</if>
+		<if test="lastestTime != null"> LASTEST_TIME,</if>
+		<if test="descriptor != null"> DESCRIPTOR,</if>
+		<if test="tenantId != null"> tenant_id,</if>
+	  </trim>
+	   values
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+		<if test="contractId != null"> #{contractId},</if>
+		<if test="baseContractId != null"> #{baseContractId},</if>
+		<if test="name != null"> #{name},</if>
+		<if test="code != null"> #{code},</if>
+		<if test="createTime != null"> #{createTime},</if>
+		<if test="state != null"> #{state},</if>
+		<if test="lastestTime != null"> #{lastestTime},</if>
+		<if test="descriptor != null"> #{descriptor},</if>
+		<if test="tenantId != null"> #{tenantId},</if>
+	 </trim>
+	</insert>
+	
+	<!--新增服务  -->
+	<insert id="ADD_SERVICE" parameterType="com.ailk.eaap.op2.bo.Service">
+	  INSERT INTO SERVICE
+	  
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="serviceId != null">SERVICE_ID,</if>
+	    <if test="contractVersionId != null">CONTRACT_VERSION_ID,</if>
+	    <if test="serviceCnName != null">SERVICE_CN_NAME,</if>
+	    <if test="serviceEnName != null">SERVICE_EN_NAME,</if>
+	    <if test="serviceCode != null">SERVICE_CODE,</if>
+	    <if test="serviceType != null">SERVICE_TYPE,</if>
+	    <if test="serviceVersion != null">SERVICE_VERSION,</if>
+	    <if test="createDate != null">CREATE_DATE,</if>
+	    <if test="state != null">STATE,</if>
+	    <if test="lastestDate != null">LASTEST_DATE,</if>
+	    <if test="serviceDesc != null">SERVICE_DESC,</if>
+	    <if test="isPublished != null">IS_PUBLISHED,</if>
+	    <if test="servicePriority != null">SERVICE_PRIORITY,</if>
+	    <if test="serviceTimeout != null">SERVICE_TIMEOUT,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	   <trim prefix="(" suffix=")" suffixOverrides=",">
+	   <if test="serviceId != null">#{serviceId},</if>
+	    <if test="contractVersionId != null">#{contractVersionId},</if>
+	    <if test="serviceCnName != null">#{serviceCnName},</if>
+	    <if test="serviceEnName != null">#{serviceEnName},</if>
+	    <if test="serviceCode != null">#{serviceCode},</if>
+	    <if test="serviceType != null">#{serviceType},</if>
+	    <if test="serviceVersion != null">#{serviceVersion},</if>
+	    <if test="createDate != null">#{createDate},</if>
+	    <if test="state != null">#{state},</if>
+	    <if test="lastestDate != null">#{lastestDate},</if>
+	    <if test="serviceDesc != null">#{serviceDesc},</if>
+	    <if test="isPublished != null">#{isPublished},</if>
+	    <if test="servicePriority != null">#{servicePriority},</if>
+	    <if test="serviceTimeout != null">#{serviceTimeout},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	   </trim>
+	</insert>
+	
+	
+	<!--新增api  -->
+	<insert id="ADD_API" parameterType="com.ailk.eaap.op2.bo.Api">
+	  INSERT INTO API
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="serviceId != null">SERVICE_ID,</if>
+	    <if test="apiId != null">API_ID,</if>
+	    <if test="apiName != null">API_NAME,</if>
+	    <if test="apiVersion != null">API_VERSION,</if>
+	    <if test="apiMethod != null">API_METHOD,</if>
+	    <if test="apiState != null">API_STATE,</if>
+	    <if test="apiRegTime != null">API_REG_TIME,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	   <trim prefix="(" suffix=")" suffixOverrides=",">
+	  	<if test="serviceId != null">#{serviceId},</if>
+	    <if test="apiId != null">#{apiId},</if>
+	    <if test="apiName != null">#{apiName},</if>
+	    <if test="apiVersion != null">#{apiVersion},</if>
+	    <if test="apiMethod != null">#{apiMethod},</if>
+	    <if test="apiState != null">#{apiState},</if>
+	    <if test="apiRegTime != null">#{apiRegTime},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	   </trim>
+	</insert>
+	
+	<!--新增组织  -->
+	<insert id="ADD_ORG" parameterType="com.ailk.eaap.op2.bo.Org">
+	  INSERT INTO ORG
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="orgId != null">ORG_ID,</if>
+	    <if test="filSFileId != null">FIL_S_FILE_ID,</if>
+	    <if test="sFileId != null">S_FILE_ID,</if>
+	    <if test="orgTypeCode != null">ORG_TYPE_CODE,</if>
+	    <if test="name != null">NAME,</if>
+	    <if test="orgCode != null">ORG_CODE,</if>
+	    <if test="orgUsername != null">ORG_USERNAME,</if>
+	    <if test="orgPwd != null">ORG_PWD,</if>
+	    <if test="certTypeCode != null">CERT_TYPE_CODE,</if>
+	    <if test="certNumber != null">CERT_NUMBER,</if>
+	    <if test="auditFlowId != null">AUDIT_FLOW_ID,</if>
+	    <if test="simpleSpell != null">SIMPLE_SPELL,</if>
+	    <if test="state != null">STATE,</if>
+	    <if test="stateTime != null">STATE_TIME,</if>
+	    <if test="createTime != null">CREATE_TIME,</if>
+	    <if test="descriptor != null">DESCRIPTOR,</if>
+	    <if test="customerId != null">CUSTOMER_ID,</if>
+	    <if test="accountId != null">ACCOUNT_ID,</if>
+	    <if test="email != null">EMAIL,</if>
+	    <if test="areaId != null">AREA_ID,</if>
+	    <if test="telephone != null">TELEPHONE,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	   <trim prefix="(" suffix=")" suffixOverrides=",">
+	  	<if test="orgId != null">#{orgId},</if>
+	    <if test="filSFileId != null">#{filSFileId},</if>
+	    <if test="sFileId != null">#{sFileId},</if>
+	    <if test="orgTypeCode != null">#{orgTypeCode},</if>
+	    <if test="name != null">#{name},</if>
+	    <if test="orgCode != null">#{orgCode},</if>
+	    <if test="orgUsername != null">#{orgUsername},</if>
+	    <if test="orgPwd != null">#{orgPwd},</if>
+	    <if test="certTypeCode != null">#{certTypeCode},</if>
+	    <if test="certNumber != null">#{certNumber},</if>
+	    <if test="auditFlowId != null">#{auditFlowId},</if>
+	    <if test="simpleSpell != null">#{simpleSpell},</if>
+	    <if test="state != null">#{state},</if>
+	    <if test="stateTime != null">#{stateTime},</if>
+	    <if test="createTime != null">#{createTime},</if>
+	    <if test="descriptor != null">#{descriptor},</if>
+	    <if test="customerId != null">#{customerId},</if>
+	    <if test="accountId != null">#{accountId},</if>
+	    <if test="email != null">#{email},</if>
+	    <if test="areaId != null">#{areaId},</if>
+	    <if test="telephone != null">#{telephone},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	   </trim>
+	</insert>
+	
+	<!--新增组件  -->
+	<insert id="ADD_COMPONENT" parameterType="com.ailk.eaap.op2.bo.Component">
+	  INSERT INTO COMPONENT
+	  
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="componentId != null">COMPONENT_ID,</if>
+	    <if test="orgId != null">ORG_ID,</if>
+	    <if test="code != null">CODE,</if>
+	    <if test="name != null">NAME,</if>
+	    <if test="componentTypeId != null">COMPONENT_TYPE_ID,</if>
+	    <if test="sfileId != null">S_FILE_ID,</if>
+	    <if test="regTime != null">REG_TIME,</if>
+	    <if test="state != null">STATE,</if>
+	    <if test="stateTime != null">STATE_TIME,</if>
+	    <if test="password != null">PASSWORD,</if>
+	    <if test="descriptor != null">DESCRIPTOR,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	   <trim prefix="(" suffix=")" suffixOverrides=",">
+	  	<if test="componentId != null">#{componentId},</if>
+	    <if test="orgId != null">#{orgId},</if>
+	    <if test="code != null">#{code},</if>
+	    <if test="name != null">#{name},</if>
+	    <if test="componentTypeId != null">#{componentTypeId},</if>
+	    <if test="sfileId != null">#{sfileId},</if>
+	    <if test="regTime != null">#{regTime},</if>
+	    <if test="state != null">#{state},</if>
+	    <if test="stateTime != null">#{stateTime},</if>
+	    <if test="password != null">#{password},</if>
+	    <if test="descriptor != null">#{descriptor},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	   </trim>
+	</insert>
+	
+	<!--新增共享文件  -->
+	<insert id="ADD_FILE_SHARE" parameterType="java.util.Map">
+	  INSERT INTO FILE_SHARE
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="sFileId != null">S_FILE_ID,</if>
+	    <if test="sFileName != null">S_FILE_NAME,</if>
+	    <if test="sFileContent != null">S_FILE_CONTENT,</if>
+	    <if test="state != null">STATE,</if>
+	    <if test="createTime != null">CREATE_TIME,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	   <trim prefix="(" suffix=")" suffixOverrides=",">
+	  	<if test="sFileId != null">#{sFileId},</if>
+	    <if test="sFileName != null">#{sFileName},</if>
+	    <if test="sFileContent != null">#{sFileContent},</if>
+	    <if test="state != null">#{state},</if>
+	    <if test="createTime != null">#{createTime},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	   </trim>
+	</insert>
+	
+	
+	<!--新增协议文档  -->
+	<insert id="ADD_CONTRACT_DOC" parameterType="com.ailk.eaap.op2.bo.ContractDoc">
+	  INSERT INTO CONTRACT_DOC
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="contractDocId != null">CONTRACT_DOC_ID,</if>
+	    <if test="baseConDocId != null">BASE_CON_DOC_ID,</if>
+	    <if test="docType != null">DOC_TYPE,</if>
+	    <if test="docName != null">DOC_NAME,</if>
+	    <if test="resourceAliss != null">RESOURCE_ALISS,</if>
+	    <if test="docVersion != null">DOC_VERSION,</if>
+	    <if test="docCreateTime != null">DOC_CREATE_TIME,</if>
+	    <if test="state != null">STATE,</if>
+	    <if test="lastestTime != null">LASTEST_TIME,</if>
+	    <if test="docPath != null">DOC_PATH,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="contractDocId != null">#{contractDocId},</if>
+	    <if test="baseConDocId != null">#{baseConDocId},</if>
+	    <if test="docType != null">#{docType},</if>
+	    <if test="docName != null">#{docName},</if>
+	    <if test="resourceAliss != null">#{resourceAliss},</if>
+	    <if test="docVersion != null">#{docVersion},</if>
+	    <if test="docCreateTime != null">#{docCreateTime},</if>
+	    <if test="state != null">#{state},</if>
+	    <if test="lastestTime != null">#{lastestTime},</if>
+	    <if test="docPath != null">#{docPath},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	  </trim>
+	</insert>
+	
+	
+	<!--新增协议版本  -->
+	<insert id="ADD_CONTRACT_VERSION" parameterType="com.ailk.eaap.op2.bo.ContractVersion">
+	  INSERT INTO CONTRACT_VERSION
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="contractVersionId != null">CONTRACT_VERSION_ID,</if>
+	    <if test="contractId != null">CONTRACT_ID,</if>
+	    <if test="version != null">VERSION,</if>
+	    <if test="createTime != null">CREATE_TIME,</if>
+	    <if test="isNeedCheck != null">IS_NEED_CHECK,</if>
+	    <if test="state != null">STATE,</if>
+	    <if test="lastestTime != null">LASTEST_TIME,</if>
+	    <if test="effDate != null">EFF_DATE,</if>
+	    <if test="expDate != null">EXP_DATE,</if>
+	    <if test="descriptor != null">DESCRIPTOR,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="contractVersionId != null">#{contractVersionId},</if>
+	    <if test="contractId != null">#{contractId},</if>
+	    <if test="version != null">#{version},</if>
+	    <if test="createTime != null">#{createTime},</if>
+	    <if test="isNeedCheck != null">#{isNeedCheck},</if>
+	    <if test="state != null">#{state},</if>
+	    <if test="lastestTime != null">#{lastestTime},</if>
+	    <if test="effDate != null">#{effDate},</if>
+	    <if test="expDate != null">#{expDate},</if>
+	    <if test="descriptor != null">#{descriptor},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	  </trim>
+	</insert>
+	
+	
+	<!--新增协议格式  -->
+	<insert id="ADD_CONTRACT_FORMAT" parameterType="java.util.Map">
+	  INSERT INTO CONTRACT_FORMAT
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="tcpCtrFId != null">TCP_CTR_F_ID,</if>
+	    <if test="contractVersionId != null">CONTRACT_VERSION_ID,</if>
+	    <if test="reqRsp != null">REQ_RSP,</if>
+	    <if test="conType != null">CON_TYPE,</if>
+	    <if test="xsdHeaderFor != null">XSD_HEADER_FOR,</if>
+	    <if test="xsdFormat != null">XSD_FORMAT,</if>
+	    <if test="xsdDemo != null">XSD_DEMO,</if>
+	    <if test="createTime != null">CREATE_TIME,</if>
+	    <if test="state != null">STATE,</if>
+	    <if test="lastestTime != null">LASTEST_TIME,</if>
+	    <if test="descriptor != null">DESCRIPTOR,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="tcpCtrFId != null">#{tcpCtrFId},</if>
+	    <if test="contractVersionId != null">#{contractVersionId},</if>
+	    <if test="reqRsp != null">#{reqRsp},</if>
+	    <if test="conType != null">#{conType},</if>
+	    <if test="xsdHeaderFor != null">#{xsdHeaderFor},</if>
+	    <if test="xsdFormat != null">#{xsdFormat},</if>
+	    <if test="xsdDemo != null">#{xsdDemo},</if>
+	    <if test="createTime != null">#{createTime},</if>
+	    <if test="state != null">#{state},</if>
+	    <if test="lastestTime != null">#{lastestTime},</if>
+	    <if test="descriptor != null">#{descriptor},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	  </trim>
+	</insert>
+	
+	
+	<!--新增节点描述 -->
+	<insert id="ADD_NODE_DESC" parameterType="com.ailk.eaap.op2.bo.NodeDesc">
+	  INSERT INTO NODE_DESC
+	  
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="nodeDescId != null">NODE_DESC_ID,</if>
+	    <if test="tcpCtrFId != null">TCP_CTR_F_ID,</if>
+	    <if test="nodeName != null">NODE_NAME,</if>
+	    <if test="nodeCode != null">NODE_CODE,</if>
+	    <if test="parentNodeId != null">PARENT_NODE_ID,</if>
+	    <if test="nodePath != null">NODE_PATH,</if>
+	    <if test="nodeType != null">NODE_TYPE,</if>
+	    <if test="nodeLengthCons != null">NODE_LENGTH_CONS,</if>
+	    <if test="nodeTypeCons != null">NODE_TYPE_CONS,</if>
+	    <if test="nodeNumberCons != null">NODE_NUMBER_CONS,</if>
+	    <if test="nevlConsType != null">NEVL_CONS_TYPE,</if>
+	    <if test="nevlConsValue != null">NEVL_CONS_VALUE,</if>
+	    <if test="nevlConsDesc != null">NEVL_CONS_DESC,</if>
+	    <if test="isNeedCheck != null">IS_NEED_CHECK,</if>
+	    <if test="isNeedSign != null">IS_NEED_SIGN,</if>
+	    <if test="state != null">STATE,</if>
+	    <if test="createTime != null">CREATE_TIME,</if>
+	    <if test="lastestTime != null">LASTEST_TIME,</if>
+	    <if test="description != null">DESCRIPTION,</if>
+	    <if test="javaField != null">JAVA_FIELD,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="nodeDescId != null">#{nodeDescId},</if>
+	    <if test="tcpCtrFId != null">#{tcpCtrFId},</if>
+	    <if test="nodeName != null">#{nodeName},</if>
+	    <if test="nodeCode != null">#{nodeCode},</if>
+	    <if test="parentNodeId != null">#{parentNodeId},</if>
+	    <if test="nodePath != null">#{nodePath},</if>
+	    <if test="nodeType != null">#{nodeType},</if>
+	    <if test="nodeLengthCons != null">#{nodeLengthCons},</if>
+	    <if test="nodeTypeCons != null">#{nodeTypeCons},</if>
+	    <if test="nodeNumberCons != null">#{nodeNumberCons},</if>
+	    <if test="nevlConsType != null">#{nevlConsType},</if>
+	    <if test="nevlConsValue != null">#{nevlConsValue},</if>
+	    <if test="nevlConsDesc != null">#{nevlConsDesc},</if>
+	    <if test="isNeedCheck != null">#{isNeedCheck},</if>
+	    <if test="isNeedSign != null">#{isNeedSign},</if>
+	    <if test="state != null">#{state},</if>
+	    <if test="createTime != null">#{createTime},</if>
+	    <if test="lastestTime != null">#{lastestTime},</if>
+	    <if test="description != null">#{description},</if>
+	    <if test="javaField != null">#{javaField},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	  </trim>
+	</insert>
+	
+	
+	<!--新增文档对应协议 -->
+	<insert id="ADD_DOC_CONTRACT" parameterType="com.ailk.eaap.op2.bo.DocContract">
+	  INSERT INTO DOC_CONTRACT
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="docContrId != null">DOC_CONTR_ID,</if>
+	    <if test="contractDocId != null">CONTRACT_DOC_ID,</if>
+	    <if test="contractVersionId != null">CONTRACT_VERSION_ID,</if>
+	    <if test="descriptor != null">DESCRIPTOR,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="docContrId != null">#{docContrId},</if>
+	    <if test="contractDocId != null">#{contractDocId},</if>
+	    <if test="contractVersionId != null">#{contractVersionId},</if>
+	    <if test="descriptor != null">#{descriptor},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	  </trim>
+	</insert>
+	
+	
+	<!--新增协议文档关联 -->
+	<insert id="ADD_CONTRACT_DOC_RELA" parameterType="java.util.Map">
+	  INSERT INTO CONTRACT_DOC_RELA
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="contractDocRelaId != null">CONTRACT_DOC_RELA_ID,</if>
+	    <if test="contractDocId != null">CONTRACT_DOC_ID,</if>
+	    <if test="relaContractDocId != null">RELA_CONTRACT_DOC_ID,</if>
+	    <if test="relaTypeCd != null">RELA_TYPE_CD,</if>
+	    <if test="state != null">STATE,</if>
+	    <if test="createTime != null">CREATE_TIME,</if>
+	    <if test="tenantId != null">tenant_id,</if>
+	  </trim>
+	  values
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="contractDocRelaId != null">#{contractDocRelaId},</if>
+	    <if test="contractDocId != null">#{contractDocId},</if>
+	    <if test="relaContractDocId != null">#{relaContractDocId},</if>
+	    <if test="relaTypeCd != null">#{relaTypeCd},</if>
+	    <if test="state != null">#{state},</if>
+	    <if test="createTime != null">#{createTime},</if>
+	    <if test="tenantId != null">#{tenantId},</if>
+	  </trim>
+	</insert>
+	
+	<!--新增协议版本关联 -->
+	<insert id="ADD_CONTRACT_VERSION_RELA" parameterType="java.util.Map">
+	  INSERT INTO CONTRACT_VERSION_RELA
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="contractVersionRelaId">CONTRACT_VERSION_RELA_ID,</if>
+	    <if test="contractVersionId">CONTRACT_VERSION_ID,</if>
+	    <if test="relaContractVersionId">RELA_CONTRACT_VERSION_ID,</if>
+	    <if test="relaTypeCd">RELA_TYPE_CD,</if>
+	    <if test="state">STATE,</if>
+	    <if test="createTime">CREATE_DATE,</if>
+	    <if test="tenantId">tenant_id,</if>
+	  </trim>
+	  values
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="contractVersionRelaId">#{contractVersionRelaId},</if>
+	    <if test="contractVersionId">#{contractVersionId},</if>
+	    <if test="relaContractVersionId">#{relaContractVersionId},</if>
+	    <if test="relaTypeCd">#{relaTypeCd},</if>
+	    <if test="state">#{state},</if>
+	    <if test="createTime">#{createTime},</if>
+	    <if test="tenantId">#{tenantId},</if>
+	  </trim>
+	</insert>
+</mapper>
